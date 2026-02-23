@@ -142,7 +142,15 @@ Public Sub ExportToCSV(Optional filePath As String = "")
     Set wsLog = ThisWorkbook.Sheets(SHT_LOG)
     
     If filePath = "" Then
-        filePath = ThisWorkbook.Path & "\DataLog_" & Format(Now, "yyyymmdd_hhnnss") & ".csv"
+        Dim wbPath As String
+        wbPath = ThisWorkbook.Path
+
+        ' ThisWorkbook.Path returns an https:// URL on OneDrive — not valid for file I/O
+        If wbPath = "" Or Left(wbPath, 4) = "http" Then
+            wbPath = Environ("USERPROFILE") & "\Documents"
+        End If
+
+        filePath = wbPath & "\DataLog_" & Format(Now, "yyyymmdd_hhnnss") & ".csv"
     End If
     
     Dim lr As Long, lc As Long

@@ -11,13 +11,17 @@ Public Sub StartAutoScan()
     If Not IsMarketHours() Then
         MsgBox "Outside market hours (" & MARKET_OPEN_HOUR & ":00 - " & MARKET_CLOSE_HOUR & ":00). " & _
                "Auto-scan will start at next market open.", vbInformation, "Auto Scan"
-        ' Schedule for next market open
+        ' Schedule for next market open (skip weekends)
         Dim nextOpen As Date
-        If Hour(Now) >= MARKET_CLOSE_HOUR Then
+        If Hour(Now) >= MARKET_OPEN_HOUR Then
             nextOpen = Int(Now) + 1 + TimeSerial(MARKET_OPEN_HOUR, 0, 0)
         Else
             nextOpen = Int(Now) + TimeSerial(MARKET_OPEN_HOUR, 0, 0)
         End If
+        ' Skip Saturday and Sunday
+        Do While Weekday(nextOpen, vbMonday) > 5
+            nextOpen = nextOpen + 1
+        Loop
         nextRunTime = nextOpen
         Application.OnTime nextOpen, "StartAutoScan"
         Exit Sub
@@ -40,9 +44,12 @@ Public Sub StartAutoScan()
         ' Schedule end-of-day summary
         Call EndOfDaySummary
         
-        ' Schedule for next market open
+        ' Schedule for next market open (skip weekends)
         Dim tmrwOpen As Date
         tmrwOpen = Int(Now) + 1 + TimeSerial(MARKET_OPEN_HOUR, 0, 0)
+        Do While Weekday(tmrwOpen, vbMonday) > 5
+            tmrwOpen = tmrwOpen + 1
+        Loop
         Application.OnTime tmrwOpen, "StartAutoScan"
         Debug.Print "Market closed. Next scan: " & Format(tmrwOpen, "yyyy-mm-dd hh:nn")
     End If
@@ -169,7 +176,12 @@ Private Sub EndOfDaySummary()
     
     ' Export daily CSV
     Dim csvPath As String
-    csvPath = ThisWorkbook.Path & "\DailyExport_" & Format(today, "yyyymmdd") & ".csv"
+    Dim eodPath As String
+    eodPath = ThisWorkbook.Path
+    If eodPath = "" Or Left(eodPath, 4) = "http" Then
+        eodPath = Environ("USERPROFILE") & "\Documents"
+    End If
+    csvPath = eodPath & "\DailyExport_" & Format(today, "yyyymmdd") & ".csv"
     Call ExportToCSV(csvPath)
     
     ' Refresh dashboard
