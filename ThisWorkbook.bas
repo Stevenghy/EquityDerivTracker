@@ -15,16 +15,15 @@ Private Sub Workbook_Open()
     If AUTO_SCAN_ON_OPEN Then
         ' Update previous close first
         Call UpdatePrevClose
-        
+
         ' Wait a moment for Bloomberg to initialize
         Application.Wait Now + TimeSerial(0, 0, 10)
-        
+
         ' Start auto scanning
         Call StartAutoScan
-    End If
-    
-    ' Always check: if command line contains "/autoscan"
-    If InStr(1, Command(), "/autoscan", vbTextCompare) > 0 Then
+
+    ElseIf InStr(1, Command(), "/autoscan", vbTextCompare) > 0 Then
+        ' Also check: if command line contains "/autoscan"
         Call UpdatePrevClose
         Application.Wait Now + TimeSerial(0, 0, 10)
         Call StartAutoScan
