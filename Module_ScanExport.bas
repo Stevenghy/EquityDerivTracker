@@ -25,7 +25,8 @@ Public Sub ExportScanToLog()
     
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
-    
+    On Error GoTo ExportError
+
     Dim i As Long
     For i = 2 To scanLastRow
         ' Read scan row
@@ -110,7 +111,7 @@ Public Sub ExportScanToLog()
             ' Format premium as percentage
             .Cells(logNextRow, COL_LOG_PREMIUM).NumberFormat = "0.0000%"
             .Cells(logNextRow, COL_LOG_PREMROUND).NumberFormat = "0.00%"
-            .Cells(logNextRow, COL_LOG_TRADETIME).NumberFormat = "yyyy-mm-dd hh:nn:ss"
+            .Cells(logNextRow, COL_LOG_TRADETIME).NumberFormat = "yyyy-mm-dd hh:mm:ss"
             .Cells(logNextRow, COL_LOG_TRADEDATE).NumberFormat = "yyyy-mm-dd"
         End With
         
@@ -139,6 +140,12 @@ NextRow:
     
     ' Refresh dashboard
     Call RefreshDashboard
+    Exit Sub
+
+ExportError:
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
+    MsgBox "Error during export at row " & i & ": " & Err.Description, vbCritical, "Export Error"
 End Sub
 
 ' ── Clear ScanInput after export (optional) ──

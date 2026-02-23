@@ -15,7 +15,7 @@ Public Sub InitializeWorkbook()
     wsScan.Columns("A:A").ColumnWidth = 20
     wsScan.Columns("B:B").ColumnWidth = 18
     wsScan.Columns("F:F").NumberFormat = "#,##0.0000"
-    wsScan.Columns("G:G").NumberFormat = "yyyy-mm-dd hh:nn:ss"
+    wsScan.Columns("G:G").NumberFormat = "yyyy-mm-dd hh:mm:ss"
     
     ' ── PrevClose Sheet ──
     Dim wsPC As Worksheet
@@ -46,7 +46,7 @@ Public Sub InitializeWorkbook()
     wsLog.Columns("G:G").NumberFormat = "#,##0.0000"
     wsLog.Columns("J:J").NumberFormat = "0.0000%"
     wsLog.Columns("K:K").NumberFormat = "0.00%"
-    wsLog.Columns("H:H").NumberFormat = "yyyy-mm-dd hh:nn:ss"
+    wsLog.Columns("H:H").NumberFormat = "yyyy-mm-dd hh:mm:ss"
     wsLog.Columns("O:O").NumberFormat = "yyyy-mm-dd"
     
     ' Hide dedup key column (still used internally)

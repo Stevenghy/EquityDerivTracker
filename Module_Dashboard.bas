@@ -34,13 +34,13 @@ Public Sub RefreshDashboard()
     wsDash.Range("A3").Font.Bold = True
     
     ' Build intraday premium chart
-    Call BuildIntradayPremiumChart wsDash, today
+    Call BuildIntradayPremiumChart(wsDash, today)
     
     ' Build trade count summary
-    Call BuildTradeSummary wsDash, today
+    Call BuildTradeSummary(wsDash, today)
     
     ' Build product breakdown
-    Call BuildProductBreakdown wsDash, today
+    Call BuildProductBreakdown(wsDash, today)
     
     Application.ScreenUpdating = True
 End Sub
@@ -90,7 +90,7 @@ Private Sub BuildIntradayPremiumChart(wsDash As Worksheet, tradeDate As Date)
     For i = 2 To lr
         If Int(wsLog.Cells(i, COL_LOG_TRADEDATE).Value) = tradeDate Then
             wsDash.Cells(row, 1).Value = wsLog.Cells(i, COL_LOG_TRADETIME).Value
-            wsDash.Cells(row, 1).NumberFormat = "hh:nn:ss"
+            wsDash.Cells(row, 1).NumberFormat = "hh:mm:ss"
             wsDash.Cells(row, 2).Value = wsLog.Cells(i, COL_LOG_PRODUCT).Value
             wsDash.Cells(row, 3).Value = wsLog.Cells(i, COL_LOG_PREMIUM).Value
             wsDash.Cells(row, 3).NumberFormat = "0.00%"
@@ -168,7 +168,7 @@ Private Sub BuildIntradayPremiumChart(wsDash As Worksheet, tradeDate As Date)
         
         .Axes(xlCategory).HasTitle = True
         .Axes(xlCategory).AxisTitle.Text = "Time"
-        .Axes(xlCategory).TickLabels.NumberFormat = "hh:nn"
+        .Axes(xlCategory).TickLabels.NumberFormat = "hh:mm"
         
         .Axes(xlValue).HasTitle = True
         .Axes(xlValue).AxisTitle.Text = "Premium (100.xx%)"
@@ -198,40 +198,45 @@ Private Sub BuildTradeSummary(wsDash As Worksheet, tradeDate As Date)
     
     summaryRow = summaryRow + 1
     
-    Dim totalTrades As Long, idbTrades As Long, clientTrades As Long
-    totalTrades = 0: idbTrades = 0: clientTrades = 0
-    
+    Dim totalTrades As Long, idbTrades As Long, clientTrades As Long, noDataTrades As Long
+    totalTrades = 0: idbTrades = 0: clientTrades = 0: noDataTrades = 0
+
     Dim totalNotional As Double
     totalNotional = 0
-    
+
     Dim i As Long
     For i = 2 To lr
         If Int(wsLog.Cells(i, COL_LOG_TRADEDATE).Value) = tradeDate Then
             totalTrades = totalTrades + 1
             totalNotional = totalNotional + wsLog.Cells(i, COL_LOG_NOTIONAL).Value
-            
-            If wsLog.Cells(i, COL_LOG_IDBFLAG).Value = "LIKELY IDB" Then
-                idbTrades = idbTrades + 1
-            Else
-                clientTrades = clientTrades + 1
-            End If
+
+            Select Case wsLog.Cells(i, COL_LOG_IDBFLAG).Value
+                Case "LIKELY IDB": idbTrades = idbTrades + 1
+                Case "LIKELY CLIENT": clientTrades = clientTrades + 1
+                Case Else: noDataTrades = noDataTrades + 1
+            End Select
         End If
     Next i
-    
+
     wsDash.Cells(summaryRow, 1).Value = "Total Crosses:"
     wsDash.Cells(summaryRow, 2).Value = totalTrades
     summaryRow = summaryRow + 1
-    
+
     wsDash.Cells(summaryRow, 1).Value = "Likely IDB:"
     wsDash.Cells(summaryRow, 2).Value = idbTrades
     wsDash.Cells(summaryRow, 2).Interior.Color = RGB(198, 239, 206)
     summaryRow = summaryRow + 1
-    
+
     wsDash.Cells(summaryRow, 1).Value = "Likely Client:"
     wsDash.Cells(summaryRow, 2).Value = clientTrades
     wsDash.Cells(summaryRow, 2).Interior.Color = RGB(255, 199, 206)
     summaryRow = summaryRow + 1
-    
+
+    wsDash.Cells(summaryRow, 1).Value = "No Close Data:"
+    wsDash.Cells(summaryRow, 2).Value = noDataTrades
+    wsDash.Cells(summaryRow, 2).Interior.Color = RGB(255, 235, 156)
+    summaryRow = summaryRow + 1
+
     wsDash.Cells(summaryRow, 1).Value = "Total Notional:"
     wsDash.Cells(summaryRow, 2).Value = totalNotional
     wsDash.Cells(summaryRow, 2).NumberFormat = "#,##0"
