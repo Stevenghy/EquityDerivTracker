@@ -179,7 +179,7 @@ Private Sub EndOfDaySummary()
     Dim eodPath As String
     eodPath = ThisWorkbook.Path
     If eodPath = "" Or Left(eodPath, 4) = "http" Then
-        eodPath = Environ("USERPROFILE") & "\Documents"
+        eodPath = "C:\Users\Steve\OneDrive\Documents\1__________\Work\MARIANA\tracker\EquityDerivTracker"
     End If
     csvPath = eodPath & "\DailyExport_" & Format(today, "yyyymmdd") & ".csv"
     Call ExportToCSV(csvPath)

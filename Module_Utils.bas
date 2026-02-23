@@ -147,7 +147,7 @@ Public Sub ExportToCSV(Optional filePath As String = "")
 
         ' ThisWorkbook.Path returns an https:// URL on OneDrive — not valid for file I/O
         If wbPath = "" Or Left(wbPath, 4) = "http" Then
-            wbPath = Environ("USERPROFILE") & "\Documents"
+            wbPath = "C:\Users\Steve\OneDrive\Documents\1__________\Work\MARIANA\tracker\EquityDerivTracker"
         End If
 
         filePath = wbPath & "\DataLog_" & Format(Now, "yyyymmdd_hhnnss") & ".csv"
