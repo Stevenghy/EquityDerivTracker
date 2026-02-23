@@ -32,7 +32,7 @@ Public Sub InitializeWorkbook()
     For i = 0 To UBound(sampleProducts)
         wsPC.Cells(i + 2, COL_PC_PRODUCT).Value = sampleProducts(i)
         wsPC.Cells(i + 2, COL_PC_CLOSE).Value = 0  ' Fill manually or via Bloomberg
-        wsPC.Cells(i + 2, COL_PC_DATE).Value = Date - 1
+        wsPC.Cells(i + 2, COL_PC_DATE).Value = GetPrevMarketDay(Date)
     Next i
     
     ' ── DataLog Sheet ──
@@ -52,6 +52,14 @@ Public Sub InitializeWorkbook()
     ' Hide dedup key column (still used internally)
     wsLog.Columns("A:A").Hidden = True
     
+    ' ── Holidays Sheet ──
+    Dim wsHol As Worksheet
+    Set wsHol = EnsureSheet(SHT_HOLIDAYS)
+    Call FormatAsTable(wsHol, Array("Holiday Date", "Description"))
+    wsHol.Columns("A:A").NumberFormat = "yyyy-mm-dd"
+    wsHol.Columns("A:A").ColumnWidth = 15
+    wsHol.Columns("B:B").ColumnWidth = 35
+
     ' ── Dashboard Sheet ──
     Dim wsDash As Worksheet
     Set wsDash = EnsureSheet(SHT_DASH)
@@ -67,11 +75,13 @@ Public Sub InitializeWorkbook()
            "• ScanInput — Bloomberg scan landing zone" & vbCrLf & _
            "• PrevClose — Previous day close levels" & vbCrLf & _
            "• DataLog — Master trade log (auto-deduped)" & vbCrLf & _
+           "• Holidays — Public holiday calendar" & vbCrLf & _
            "• Dashboard — Intraday charts" & vbCrLf & vbCrLf & _
            "Next steps:" & vbCrLf & _
-           "1. Fill in PrevClose levels for your products" & vbCrLf & _
-           "2. Configure Bloomberg scan formulas in ScanInput" & vbCrLf & _
-           "3. Click 'Export to Log' after each scan", _
+           "1. Add public holidays to the Holidays sheet" & vbCrLf & _
+           "2. Fill in PrevClose levels for your products" & vbCrLf & _
+           "3. Configure Bloomberg scan formulas in ScanInput" & vbCrLf & _
+           "4. Click 'Export to Log' after each scan", _
            vbInformation, "Setup Complete"
 End Sub
 

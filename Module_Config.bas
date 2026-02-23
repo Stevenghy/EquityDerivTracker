@@ -8,6 +8,12 @@ Public Const SHT_SCAN As String = "ScanInput"
 Public Const SHT_LOG As String = "DataLog"
 Public Const SHT_CLOSE As String = "PrevClose"
 Public Const SHT_DASH As String = "Dashboard"
+Public Const SHT_HOLIDAYS As String = "Holidays"
+
+' ── Holidays Column Layout ──
+' A=HolidayDate, B=Description
+Public Const COL_HOL_DATE As Long = 1
+Public Const COL_HOL_DESC As Long = 2
 
 ' ── ScanInput Column Layout ──
 ' A=Timestamp, B=Product, C=Lots, D=Notional, E=Condition, F=CrossLevel, G=TradeTime

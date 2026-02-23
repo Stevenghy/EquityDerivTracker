@@ -129,25 +129,35 @@ Public Sub UpdatePrevClose()
     Dim lr As Long
     lr = LastRow(wsPC, COL_PC_PRODUCT)
     
+    ' Determine the previous market day (skips weekends + public holidays)
+    Dim prevMktDay As Date
+    prevMktDay = GetPrevMarketDay(Date)
+
+    ' Update close date for all products
+    Dim i As Long
+    For i = 2 To lr
+        wsPC.Cells(i, COL_PC_DATE).Value = prevMktDay
+    Next i
+
     ' ──────────────────────────────────────────────────────
     ' BLOOMBERG CLOSE PRICE UPDATE
     ' ──────────────────────────────────────────────────────
-    ' For each product in PrevClose sheet, pull yesterday's
+    ' For each product, pull the previous market day's
     ' closing level via BDP:
     '
-    ' Dim i As Long
     ' For i = 2 To lr
     '     Dim ticker As String
     '     ticker = wsPC.Cells(i, COL_PC_PRODUCT).Value
-    '     ' wsPC.Cells(i, COL_PC_CLOSE).Formula = "=BDP(""" & ticker & " Index"",""PX_LAST"")"
-    '     ' wsPC.Cells(i, COL_PC_DATE).Formula = "=BDP(""" & ticker & " Index"",""PREV_CLOSE_DT"")"
+    '     wsPC.Cells(i, COL_PC_CLOSE).Formula = "=BDP(""" & ticker & " Index"",""PX_LAST"")"
     ' Next i
     '
     ' wsPC.Calculate
     ' ──────────────────────────────────────────────────────
-    
-    Debug.Print "Previous close levels updated at " & Format(Now, "hh:nn:ss")
-    MsgBox "Previous close levels updated.", vbInformation, "PrevClose Update"
+
+    Debug.Print "Previous close date set to " & Format(prevMktDay, "yyyy-mm-dd") & _
+                " at " & Format(Now, "hh:nn:ss")
+    MsgBox "Previous close date: " & Format(prevMktDay, "yyyy-mm-dd") & vbCrLf & _
+           "(Weekends and public holidays skipped)", vbInformation, "PrevClose Update"
 End Sub
 
 ' ── End of Day Summary (auto-runs after market close) ──

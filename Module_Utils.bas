@@ -107,6 +107,67 @@ Public Function CountDP(val As Double) As Long
     End If
 End Function
 
+' ── Get previous market day (skips weekends and public holidays) ──
+Public Function GetPrevMarketDay(Optional fromDate As Date = 0) As Date
+    If fromDate = 0 Then fromDate = Date
+
+    Dim candidate As Date
+    candidate = fromDate - 1
+
+    ' Load holidays from Holidays sheet
+    Dim wsHol As Worksheet
+    On Error Resume Next
+    Set wsHol = ThisWorkbook.Sheets(SHT_HOLIDAYS)
+    On Error GoTo 0
+
+    ' Keep stepping back until we find a valid market day
+    Dim maxLookback As Long
+    maxLookback = 0
+
+    Do
+        ' Skip weekends (Saturday=6, Sunday=7 with vbMonday start)
+        If Weekday(candidate, vbMonday) > 5 Then
+            candidate = candidate - 1
+            maxLookback = maxLookback + 1
+            If maxLookback > 30 Then Exit Do  ' Safety limit
+            GoTo NextCandidate
+        End If
+
+        ' Skip public holidays
+        If Not wsHol Is Nothing Then
+            Dim lr As Long
+            lr = LastRow(wsHol, COL_HOL_DATE)
+
+            Dim isHoliday As Boolean
+            isHoliday = False
+
+            Dim i As Long
+            For i = 2 To lr
+                If Int(wsHol.Cells(i, COL_HOL_DATE).Value) = Int(candidate) Then
+                    isHoliday = True
+                    Exit For
+                End If
+            Next i
+
+            If isHoliday Then
+                candidate = candidate - 1
+                maxLookback = maxLookback + 1
+                If maxLookback > 30 Then Exit Do  ' Safety limit
+                GoTo NextCandidate
+            End If
+        End If
+
+        ' Valid market day found
+        GetPrevMarketDay = candidate
+        Exit Function
+
+NextCandidate:
+    Loop
+
+    ' Fallback if nothing found within 30 days
+    GetPrevMarketDay = fromDate - 1
+End Function
+
 ' ── Ensure sheet exists, create if not ──
 Public Function EnsureSheet(sheetName As String) As Worksheet
     Dim ws As Worksheet
