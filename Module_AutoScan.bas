@@ -150,7 +150,7 @@ Public Sub UpdatePrevClose()
     MsgBox "Previous close levels updated.", vbInformation, "PrevClose Update"
 End Sub
 
-' ── End of Day Summary (auto-runs after market close) ──
+' â”€â”€ End of Day Summary (auto-runs after market close) â”€â”€
 Private Sub EndOfDaySummary()
     Dim wsLog As Worksheet
     Set wsLog = ThisWorkbook.Sheets(SHT_LOG)
@@ -176,12 +176,7 @@ Private Sub EndOfDaySummary()
     
     ' Export daily CSV
     Dim csvPath As String
-    Dim eodPath As String
-    eodPath = ThisWorkbook.Path
-    If eodPath = "" Or Left(eodPath, 4) = "http" Then
-        eodPath = Environ("USERPROFILE") & "\Documents"
-    End If
-    csvPath = eodPath & "\DailyExport_" & Format(today, "yyyymmdd") & ".csv"
+    csvPath = ThisWorkbook.Path & "\DailyExport_" & Format(today, "yyyymmdd") & ".csv"
     Call ExportToCSV(csvPath)
     
     ' Refresh dashboard
@@ -192,3 +187,4 @@ Private Sub EndOfDaySummary()
     
     Debug.Print "End of day summary: " & totalTrades & " trades (" & idbCount & " IDB)"
 End Sub
+
